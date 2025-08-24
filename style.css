@@ -38,6 +38,12 @@ font-weight: bolder;
 .thinking span:nth-child(1) {
     animation-delay: -0.32s;
 }
+.attachment{
+    max-width:  50%;
+    object-fit: contain;
+    border-radius: 13px 3px 13px 13px;
+    
+}
 
 .thinking span:nth-child(2) {
     animation-delay: -0.16s;

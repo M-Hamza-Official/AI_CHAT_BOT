@@ -16,11 +16,7 @@
   hljs.highlightAll(); // run on page load
 </script>
 
-    <!-- <script>
-        tailwind.config = {
-            plugins: [tailwind.typography],
-            }
-        </script> -->
+    
     <script>
         tailwind.config = {
             plugins: [tailwind.typography],
@@ -32,10 +28,11 @@
 
 <body class="bg-gray-100 flex items-center justify-center min-h-screen p-4">
 
-    <main class="w-full h-fu max-w-3xl mx-auto">
-        <div class="container  rounded-lg shadow-lg bg-white overflow-hidden">
+    <main class="w-full   max-w-3xl mx-auto">
+<!-- container changed: flex column + fixed viewport height (80vh) -->
+<div class="container bg-gray-50 rounded-lg shadow-lg overflow-hidden flex flex-col h-[70vh] max-w-3xl mx-auto">
             <!-- Header -->
-             <h1>complete me now</h1>
+             <!-- <h1>complete me now</h1> -->
             <div class="header bg-[#C8C7FF] p-4 flex justify-between items-center">
                 <div class="flex items-center gap-3">
                     <div class="bg-white rounded-full p-2 shadow-sm">
@@ -53,10 +50,11 @@
             </div>
 
             <!-- Chat Messages Container -->
-            <div class="botBody p-5 max-h-[60vh] overflow-y-auto bg-gray-50">
+<!-- botBody becomes the scrollable growing area -->
+<div class="botBody p-5 overflow-y-auto flex-1">
                 <div class="message-box flex flex-col gap-4">
                     <!-- Bot Message -->
-                    <!-- <div class="bot-message flex gap-3 items-start max-w-[90%]">
+                    <div class="bot-message flex gap-3 items-start max-w-[90%]">
                         <div class="min-w-[35px]">
                             <img class="h-[35px] w-[35px] rounded-full p-1 bg-[#C8C7FF]" src="./logo.svg" alt="Bot Avatar">
                         </div>
@@ -65,7 +63,7 @@
                         </div>
                     </div>
 
-                    <-- User Message -->
+                    <!-- <-- User Message --> 
                     <!-- <div class="user-message flex gap-3 items-start ml-auto max-w-[90%]">
                         <div class="bg-[#E8E7FF] rounded-tl-[13px] rounded-tr-[13px] rounded-br-[3px] rounded-bl-[13px] px-4 py-3 shadow-sm">
                             <p>Lorem ipsum dolor sit amet consectetur adipisicing elit.</p>
@@ -75,9 +73,9 @@
                                 <span class="text-sm font-medium">You</span>
                             </div>
                         </div>
-                    </div> -->
+                    </div>
 
-                    <!-- Bot Thinking -->
+                    <-- Bot Thinking -->
 
                 </div>
             </div>
@@ -99,7 +97,7 @@
                     </label>
                     <input id="file-upload" type="file" class="hidden" />
 
-                    <button type="submit"
+                    <button class="input-button" type="submit"
                         class="bg-[#C8C7FF] text-gray-800 px-4 py-2 rounded-lg hover:bg-[#a5a4ff] transition-all font-medium flex items-center gap-2">
                         Send
                         <i class="fas fa-paper-plane"></i>
@@ -109,19 +107,24 @@
         </div>
         </div>
     </main>
-    <!-- template html -->
-    <template id="user-message-template">
-        <div class="user-message flex gap-3 items-start ml-auto max-w-[90%]">
-            <div class="bg-[#C8C7FF] rounded-lg px-4 py-3 shadow-sm">
-                <p class="message-text"></p>
-            </div>
-            <div class="min-w-[35px]">
-                <div class="h-[35px] w-[35px] rounded-full bg-blue-500 flex items-center justify-center text-white">
-                    <span class="text-sm font-medium">You</span>
-                </div>
-            </div>
-        </div>
-    </template>
+   <template id="user-message-template">
+  <div class="user-message flex flex-col items-end gap-2 ml-auto max-w-[90%]">
+    <!-- image preview (separate block above the text bubble) -->
+    <div class="image-preview-wrapper w-full flex justify-end"></div>
+
+    <!-- text bubble (aligned to right) -->
+    <div class="bg-[#C8C7FF] response-text-wrapper rounded-lg px-4 py-3 shadow-sm max-w-[70%]">
+      <p class="message-text"></p>
+    </div>
+
+    <!-- avatar -->
+    <div class="min-w-[35px]">
+      <div class="h-[35px] w-[35px] rounded-full bg-blue-500 flex items-center justify-center text-white">
+        <span class="text-sm font-medium">You</span>
+      </div>
+    </div>
+  </div>
+</template>
 
 
     <script src="./script.js"></script>

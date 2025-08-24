@@ -4,10 +4,14 @@ const chatBody = document.querySelector('.message-box');
 const userInput = document.querySelector('.user-input');
 const form = document.querySelector('form');
 const chatmainBody = document.querySelector('.botBody');
-
+const fileInput = document.querySelector('#file-upload');
+const inputButton = document.querySelector('.input-button');
 let chatData = {
-  message: []
+  message: [],
+  file: {}
 }
+console.log(chatData);
+
 //Gemini Api SetUp
 const API_KEY = 'AIzaSyCpbw7LMLgs33JrDjYpuxWSt3Ff8ICFhQg';
 const API_URL = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${API_KEY}`;
@@ -21,7 +25,10 @@ async function getBotResponse() {
       contents: [
         {
           role: 'user',
-          parts: [{ text: chatData.message[chatData.message.length - 1] }] // join all user messages
+          parts: [{ text: chatData.message[chatData.message.length - 1] },
+
+          ...(chatData.file.data ? [{ inline_data: chatData.file }] : [])
+          ] // join all user messages
         }
       ]
     })
@@ -50,9 +57,29 @@ async function getBotResponse() {
     hideThinking()
   }
 }
-// getBotResponse()
 
+function fileUploadHandler() {
+  inputButton.addEventListener('click', fileInput.click());
+  fileInput.addEventListener('change', () => {
+    let file = fileInput.files[0];
+    if (!file) return;
+    console.log(chatData);
+    //way to read file
+    let reader = new FileReader;
+    reader.onload = (e) => {
+      const Base64Str = e.target.result.split(',')[1];
+      chatData.file = {
+        data: Base64Str,
+        mime_type: file.type
+      }
+    }
 
+    //converts it to Base64 string
+    reader.readAsDataURL(file);
+    fileInput.value ='';
+  })
+}
+fileUploadHandler();
 
 
 function addMessage(userMessage) {
@@ -61,9 +88,22 @@ function addMessage(userMessage) {
   const messageElm = template.content.cloneNode(true);
   // console.log(messageElm);
   chatData.message.push(userMessage);
+
+  if(chatData.file && chatData.file.data){
+  let fileImagePR = document.createElement('div')
+  fileImagePR.classList.add('attachment');
+ let image = document.createElement('img');
+
+  image.src = `data:${chatData.file.mime_type};base64,${chatData.file.data}`
+  fileImagePR.appendChild(image);
+
+  messageElm.querySelector('.image-preview-wrapper').appendChild(fileImagePR);
+
+  }
   messageElm.querySelector('.message-text').textContent = userMessage;
+
   chatBody.appendChild(messageElm);
-  // showThinking()
+  
   showThinking();
   scrollToBottom();
 
