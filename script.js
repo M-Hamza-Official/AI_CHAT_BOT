@@ -6,6 +6,11 @@ const form = document.querySelector('form');
 const chatmainBody = document.querySelector('.botBody');
 const fileInput = document.querySelector('#file-upload');
 const inputButton = document.querySelector('.input-button');
+const previewContainer = document.getElementById('form-preview');
+
+
+
+
 let chatData = {
   message: [],
   file: {}
@@ -16,21 +21,16 @@ console.log(chatData);
 const API_KEY = 'AIzaSyCpbw7LMLgs33JrDjYpuxWSt3Ff8ICFhQg';
 const API_URL = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${API_KEY}`;
 
+const chatHistory = []
+
+
 //getting Gemini Response
 async function getBotResponse() {
   const requestOptions = {
     method: 'POST',
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify({
-      contents: [
-        {
-          role: 'user',
-          parts: [{ text: chatData.message[chatData.message.length - 1] },
-
-          ...(chatData.file.data ? [{ inline_data: chatData.file }] : [])
-          ] // join all user messages
-        }
-      ]
+      contents: chatHistory
     })
   };
 
@@ -44,6 +44,13 @@ async function getBotResponse() {
     formatGeminiResponse(rawResponse)
     // Clean the response by removing unwanted symbols and normalizing spaces
     let geminiResponse = formatGeminiResponse(rawResponse);
+    chatHistory.push(
+        {
+          role: 'model',
+          parts: [{ text:geminiResponse }
+          ] // join all user messages
+        }
+      )
 
     let parsedResponse = marked.parse(geminiResponse)
 
@@ -57,6 +64,13 @@ async function getBotResponse() {
     hideThinking()
   }
 }
+
+
+
+userInput.addEventListener('input', function () {
+  this.style.height = 'auto'; // reset height
+  this.style.height = this.scrollHeight + 'px'; // set new height
+});
 
 function fileUploadHandler() {
   inputButton.addEventListener('click', fileInput.click());
@@ -72,7 +86,33 @@ function fileUploadHandler() {
         data: Base64Str,
         mime_type: file.type
       }
+
+  previewContainer.innerHTML = ''; // only one image at a time
+      const previewBox = document.createElement('div');
+      previewBox.className = "relative";
+
+      const img = document.createElement('img');
+      img.src = e.target.result; // direct data URL
+      img.className = "h-20 w-20 object-cover rounded border";
+
+      const removeBtn = document.createElement('button');
+      removeBtn.type = "button";
+      removeBtn.innerHTML = "✕";
+      removeBtn.className = "absolute top-0 right-0 bg-red-500 p-2 text-white rounded-full w-5 h-5 flex items-center justify-center";
+      removeBtn.onclick = () => {
+        chatData.file = {};        // clear stored file
+        previewContainer.innerHTML = ''; // clear preview
+      };
+
+      previewBox.appendChild(img);
+      previewBox.appendChild(removeBtn);
+      previewContainer.appendChild(previewBox);
+
+
     }
+
+
+
 
     //converts it to Base64 string
     reader.readAsDataURL(file);
@@ -103,7 +143,7 @@ function addMessage(userMessage) {
   messageElm.querySelector('.message-text').textContent = userMessage;
 
   chatBody.appendChild(messageElm);
-  
+  // chatData.file = {}
   showThinking();
   scrollToBottom();
 
@@ -138,9 +178,22 @@ function sendMessage() {
   if (!userMessage) return;
 
   addMessage(userMessage);
+  chatHistory.push(
+        {
+          role: 'user',
+          parts: [{ text: chatData.message[chatData.message.length - 1] },
+
+          ...(chatData.file.data ? [{ inline_data: chatData.file }] : [])
+          ] // join all user messages
+        }
+      )
 
   // showThinking()
   userInput.value = ""; // Clear input
+  previewContainer.innerHTML = '';
+  chatData.file = {
+
+  }
   getBotResponse();
   scrollToBottom();
 }
